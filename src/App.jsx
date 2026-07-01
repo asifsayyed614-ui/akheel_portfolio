@@ -21,6 +21,27 @@ const PROJECTS = [
     featured: true,
     description: 'Developing a real-life smart parking system that integrates wireless EV charging pads with automated Indian billing infrastructure. The system detects vehicle presence, initiates contactless charging via inductive coils, and generates dynamic billing based on energy consumed — designed around Indian parking standards and UPI-based payment integration.',
     tags: ['Wireless Power Transfer', 'IoT', 'EV Charging', 'Embedded Systems', 'UPI Billing'],
+    phases: [
+      {
+        number: '01',
+        title: 'Phase 1: Vehicle Alignment & Coil Resonance Coupling',
+        status: 'Completed',
+        desc: 'Detects the vehicle using ultrasonic/IR sensors as it enters the parking slot, activates the high-frequency transmitter coil embedded in the ground, and achieves magnetic resonance coupling with the vehicle\'s receiver coil for efficient, touchless power transfer.'
+      },
+      {
+        number: '02',
+        title: 'Phase 2: Automated Energy Monitoring & UPI Billing',
+        status: 'In Progress',
+        desc: 'Monitors current and voltage in real-time to calculate cumulative energy consumption. Upon charge completion or vehicle departure, the system generates a dynamic UPI QR code displayed on a local screen or app for automated billing and touchless checkout.'
+      }
+    ],
+    features: [
+      'High-frequency magnetic resonance wireless charging pads',
+      'Intelligent vehicle presence and positioning detection sensors',
+      'Real-time power monitoring and energy calculation algorithms',
+      'Dynamic UPI QR code generation and direct payment gateway integration',
+      'Fail-safe thermal and overcurrent safety cutoff protections'
+    ]
   },
   {
     id: 2,
@@ -31,6 +52,26 @@ const PROJECTS = [
     featured: false,
     description: 'Built a mini project for an automatic touchless water tap using IR proximity sensors without Arduino — demonstrating pure analog/digital circuit design with discrete components, enabling hygienic contactless flow control.',
     tags: ['IR Sensors', 'Analog Circuits', 'Embedded Design', 'PCB Layout'],
+    phases: [
+      {
+        number: '01',
+        title: 'Phase 1: Hand Proximity Detection',
+        status: 'Completed',
+        desc: 'Emits and detects infrared light reflections to sense when a user\'s hands are near the faucet nozzle, changing the analog sensor output voltage.'
+      },
+      {
+        number: '02',
+        title: 'Phase 2: Valve Actuation & Automatic Cutoff',
+        status: 'Completed',
+        desc: 'Uses discrete transistor switches to drive a solenoid valve, letting water flow for the duration of hand detection without requiring any programming or microcontroller.'
+      }
+    ],
+    features: [
+      'Pure analog/digital circuit design operating without microcontrollers',
+      'Highly sensitive IR transmitter-receiver pair with adjustable range',
+      '5V/12V DC solenoid valve integration with flyback diode protection',
+      'Low power consumption in standby mode for long-lasting operation'
+    ]
   },
   {
     id: 3,
@@ -41,7 +82,27 @@ const PROJECTS = [
     featured: false,
     description: 'Designed a light-sensing circuit using an LDR (Light Dependent Resistor) and IC 741 op-amp comparator to automatically trigger loads based on ambient light intensity — applicable for street lights and energy-saving automation.',
     tags: ['LDR Sensor', 'IC 741 Op-Amp', 'Comparator Circuit', 'Power Electronics'],
-  },
+    phases: [
+      {
+        number: '01',
+        title: 'Phase 1: Ambient Light Measurement',
+        status: 'Completed',
+        desc: 'Utilizes a Light Dependent Resistor (LDR) to convert ambient light intensity into an electrical resistance value, forming a voltage divider input.'
+      },
+      {
+        number: '02',
+        title: 'Phase 2: IC 741 Comparator & Load Switching',
+        status: 'Completed',
+        desc: 'An IC 741 Operational Amplifier compares the input voltage against a predefined threshold, outputting a signal to trigger a transistor-driven electromagnetic relay.'
+      }
+    ],
+    features: [
+      'Industrial-standard IC 741 Op-Amp comparator configuration',
+      'Adjustable threshold calibration potentiometer for fine tuning sensitivity',
+      '10A relay output support to switch AC loads (street lights, domestic lights)',
+      'Noise filtering components to prevent false triggering from transient light changes'
+    ]
+  }
 ];
 
 const EDUCATION = [
@@ -375,13 +436,38 @@ function Skills() {
 }
 
 function Projects() {
+  const [activeProject, setActiveProject] = useState(null);
+
+  // Esc key closes modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setActiveProject(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Lock body scroll when modal is active
+  useEffect(() => {
+    if (activeProject) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [activeProject]);
+
   return (
     <Section id="projects" style={{ padding: 'clamp(80px, 12vw, 140px) clamp(16px, 5vw, 48px)', background: 'rgba(15,15,26,0.25)' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         <SectionTitle sub="Engineering Work">Projects</SectionTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {PROJECTS.map(p => (
-            <div key={p.id} style={{ background: 'rgba(15,15,26,0.75)', padding: '28px 28px 24px', position: 'relative', overflow: 'hidden', border: `1px solid ${p.type === 'plasma' ? 'rgba(0,229,255,0.15)' : 'rgba(232,255,0,0.1)'}`, transition: 'all 0.3s ease' }}
+            <div key={p.id} 
+              onClick={() => setActiveProject(p)}
+              style={{ background: 'rgba(15,15,26,0.75)', padding: '28px 28px 24px', position: 'relative', overflow: 'hidden', border: `1px solid ${p.type === 'plasma' ? 'rgba(0,229,255,0.15)' : 'rgba(232,255,0,0.1)'}`, transition: 'all 0.3s ease', cursor: 'pointer' }}
               onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
             >
@@ -395,8 +481,22 @@ function Projects() {
                     {p.featured && <span style={{ fontFamily: 'Share Tech Mono', fontSize: '10px', color: '#00E5FF', animation: 'flicker 2s infinite' }}>FEATURED</span>}
                   </div>
                   <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '14px' }}>{p.description}</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {p.tags.map(t => <span key={t} className={p.type === 'plasma' ? 'plasma-tag' : 'tag'}>{t}</span>)}
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {p.tags.map(t => <span key={t} className={p.type === 'plasma' ? 'plasma-tag' : 'tag'}>{t}</span>)}
+                    </div>
+                    <span style={{ 
+                      fontFamily: 'Share Tech Mono', 
+                      fontSize: '0.75rem', 
+                      color: p.type === 'plasma' ? '#00E5FF' : '#E8FF00', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '4px',
+                      opacity: 0.85
+                    }}>
+                      DETAILS & PHASES →
+                    </span>
                   </div>
                 </div>
               </div>
@@ -404,6 +504,148 @@ function Projects() {
           ))}
         </div>
       </div>
+
+      {/* Project Details Modal */}
+      {activeProject && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(5, 5, 10, 0.85)', backdropFilter: 'blur(12px)',
+          padding: '20px', transition: 'all 0.3s ease'
+        }}
+        onClick={() => setActiveProject(null)}
+        >
+          <div style={{
+            background: '#0D0D15',
+            border: `1px solid ${activeProject.type === 'plasma' ? '#00E5FF' : '#E8FF00'}`,
+            boxShadow: `0 0 40px ${activeProject.type === 'plasma' ? 'rgba(0,229,255,0.2)' : 'rgba(232,255,0,0.2)'}`,
+            width: '100%', maxWidth: '680px',
+            borderRadius: '8px', padding: '36px',
+            position: 'relative',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}
+          onClick={e => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button onClick={() => setActiveProject(null)} style={{
+              position: 'absolute', top: '24px', right: '24px',
+              background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',
+              cursor: 'pointer', fontSize: '1.25rem', padding: '4px', transition: 'color 0.2s',
+              lineHeight: 1
+            }}
+            onMouseEnter={e => e.target.style.color = activeProject.type === 'plasma' ? '#00E5FF' : '#E8FF00'}
+            onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.4)'}
+            >
+              ✕
+            </button>
+
+            {/* Modal Header */}
+            <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap' }}>
+              <div style={{ width: '64px', height: '64px', flexShrink: 0, background: activeProject.type === 'plasma' ? 'rgba(0,229,255,0.08)' : 'rgba(232,255,0,0.08)', border: `1px solid ${activeProject.type === 'plasma' ? 'rgba(0,229,255,0.25)' : 'rgba(232,255,0,0.2)'}`, borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.2rem' }}>
+                {activeProject.emoji}
+              </div>
+              <div style={{ flex: 1, minWidth: '200px' }}>
+                <h3 style={{ fontFamily: 'Orbitron, sans-serif', fontWeight: 900, color: 'white', fontSize: '1.4rem', margin: '0 0 6px 0', letterSpacing: '0.03em', lineHeight: 1.2 }}>
+                  {activeProject.title}
+                </h3>
+                <span className={activeProject.type === 'plasma' ? 'plasma-tag' : 'tag'}>
+                  {activeProject.type === 'plasma' ? '● ' : '✓ '}{activeProject.status}
+                </span>
+              </div>
+            </div>
+
+            {/* Description */}
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', lineHeight: 1.8, marginBottom: '28px' }}>
+              {activeProject.description}
+            </p>
+
+            {/* Phases Section */}
+            {activeProject.phases && (
+              <div style={{ marginBottom: '32px' }}>
+                <h4 style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.85rem', color: activeProject.type === 'plasma' ? '#00E5FF' : '#E8FF00', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '8px' }}>
+                  System Development Phases
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', position: 'relative', paddingLeft: '16px' }}>
+                  {/* Vertical line indicator */}
+                  <div style={{ position: 'absolute', left: '7px', top: '12px', bottom: '12px', width: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                  
+                  {activeProject.phases.map((phase, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: '20px', position: 'relative' }}>
+                      {/* Bullet marker */}
+                      <div style={{ 
+                        width: '15px', height: '15px', borderRadius: '50%', 
+                        background: phase.status === 'Completed' 
+                          ? (activeProject.type === 'plasma' ? '#00E5FF' : '#E8FF00')
+                          : 'rgba(255, 255, 255, 0.1)', 
+                        border: '3px solid #0D0D15', 
+                        position: 'absolute', left: '-22px', top: '5px',
+                        boxShadow: phase.status === 'Completed'
+                          ? `0 0 10px ${activeProject.type === 'plasma' ? '#00E5FF' : '#E8FF00'}`
+                          : 'none'
+                      }} />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                          <span style={{ fontFamily: 'Share Tech Mono', fontSize: '0.75rem', color: phase.status === 'Completed' ? (activeProject.type === 'plasma' ? '#00E5FF' : '#E8FF00') : 'rgba(255,255,255,0.4)', border: `1px solid ${phase.status === 'Completed' ? (activeProject.type === 'plasma' ? 'rgba(0,229,255,0.3)' : 'rgba(232,255,0,0.3)') : 'rgba(255,255,255,0.1)'}`, padding: '1px 6px', borderRadius: '2px' }}>
+                            {phase.number}
+                          </span>
+                          <h5 style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, color: 'white', fontSize: '0.95rem', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                            {phase.title}
+                            {phase.status && (
+                              <span style={{ 
+                                fontSize: '0.65rem', 
+                                fontFamily: 'Share Tech Mono', 
+                                color: phase.status === 'Completed' ? '#00E5FF' : '#E8FF00',
+                                border: `1px solid ${phase.status === 'Completed' ? 'rgba(0,229,255,0.25)' : 'rgba(232,255,0,0.25)'}`,
+                                background: phase.status === 'Completed' ? 'rgba(0,229,255,0.05)' : 'rgba(232,255,0,0.05)',
+                                padding: '1px 6px',
+                                borderRadius: '2px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em'
+                              }}>
+                                {phase.status}
+                              </span>
+                            )}
+                          </h5>
+                        </div>
+                        <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>
+                          {phase.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Features Section */}
+            {activeProject.features && (
+              <div style={{ marginBottom: '28px' }}>
+                <h4 style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.85rem', color: activeProject.type === 'plasma' ? '#00E5FF' : '#E8FF00', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '8px' }}>
+                  Key Technical Features
+                </h4>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {activeProject.features.map((feature, idx) => (
+                    <li key={idx} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem', lineHeight: 1.5 }}>
+                      <span style={{ color: activeProject.type === 'plasma' ? '#00E5FF' : '#E8FF00', fontWeight: 'bold' }}>✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Modal Footer Tags */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '20px' }}>
+              {activeProject.tags.map(t => (
+                <span key={t} className={activeProject.type === 'plasma' ? 'plasma-tag' : 'tag'}>
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </Section>
   );
 }
